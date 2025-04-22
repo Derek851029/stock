@@ -1,0 +1,10 @@
+
+
+body{
+  overflow-y: hidden;
+  background-color: var(--color-gray-900);
+}
+
+.text-foreground{
+  color: white ;
+}

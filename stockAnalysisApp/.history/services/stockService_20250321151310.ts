@@ -1,0 +1,185 @@
+import axios from "axios";
+import api from "./apis";
+
+interface StockDataResponse {
+  [key: string]: any;
+}
+
+interface ResponseValues {
+  time?: string;
+  datetime?: string;
+  open: string | number;
+  high: string | number;
+  low: string | number;
+  close: string | number;
+  volume: string | number;
+}
+
+interface TopGainersData {
+  code: string;
+  name: string;
+  price: number;
+  change: number;
+  percentage: number;
+  volume: string;
+  marketCap: string;
+}
+
+interface TopGainersResponse {
+  data: TopGainersData[];
+}
+
+const getDataByStockName = async (
+  symbol: string,
+  interval: string
+): Promise<StockDataResponse> => {
+  try {
+    const response = await api.get<StockDataResponse>("/time_series", {
+      symbol: symbol,
+      interval: interval,
+    });
+
+    const values = response?.values.map((item: ResponseValues) => {
+      item.time = item.datetime;
+      item.open = parseFloat(item.open as string);
+      item.high = parseFloat(item.high as string);
+      item.low = parseFloat(item.low as string);
+      item.close = parseFloat(item.close as string);
+      item.volume = parseInt(item.volume as string);
+      delete item.datetime;
+      return item;
+    });
+
+    response.values = values;
+
+    return response;
+  } catch (error) {
+    console.error("Error fetching stock data:", error);
+    throw error;
+  }
+};
+
+const getTopGainers = async () => {
+  try {
+    const stocks: TopGainersResponse = {
+      data: <TopGainersData[]>[
+        {
+          code: "AAPL",
+          name: "Apple Inc.",
+          price: 175.43,
+          change: 2.5,
+          percentage: 1.45,
+          volume: "1.2億",
+          marketCap: "2.8兆",
+        },
+        {
+          code: "MSFT",
+          name: "Microsoft Corp.",
+          price: 315.67,
+          change: 5.32,
+          percentage: 1.72,
+          volume: "9800萬",
+          marketCap: "2.5兆",
+        },
+        {
+          code: "TSLA",
+          name: "Tesla Inc.",
+          price: 210.35,
+          change: -3.45,
+          percentage: -1.61,
+          volume: "7200萬",
+          marketCap: "7500億",
+        },
+        {
+          code: "NVDA",
+          name: "NVIDIA Corp.",
+          price: 450.12,
+          change: 10.22,
+          percentage: 2.32,
+          volume: "8300萬",
+          marketCap: "1.1兆",
+        },
+        {
+          code: "GOOGL",
+          name: "Alphabet Inc.",
+          price: 130.89,
+          change: 1.98,
+          percentage: 1.54,
+          volume: "6500萬",
+          marketCap: "1.7兆",
+        },
+        {
+          code: "AMZN",
+          name: "Amazon.com Inc.",
+          price: 145.76,
+          change: -0.87,
+          percentage: -0.59,
+          volume: "8900萬",
+          marketCap: "1.5兆",
+        },
+        {
+          code: "META",
+          name: "Meta Platforms Inc.",
+          price: 290.45,
+          change: 4.12,
+          percentage: 1.44,
+          volume: "5600萬",
+          marketCap: "9500億",
+        },
+        {
+          code: "NFLX",
+          name: "Netflix Inc.",
+          price: 390.23,
+          change: -2.18,
+          percentage: -0.56,
+          volume: "4300萬",
+          marketCap: "2000億",
+        },
+        {
+          code: "BRK.B",
+          name: "Berkshire Hathaway",
+          price: 325.78,
+          change: 6.45,
+          percentage: 2.02,
+          volume: "3700萬",
+          marketCap: "7300億",
+        },
+        {
+          code: "JPM",
+          name: "JPMorgan Chase & Co.",
+          price: 158.32,
+          change: 1.78,
+          percentage: 1.14,
+          volume: "5200萬",
+          marketCap: "4800億",
+        },
+      ],
+    };
+    return stocks;
+    // const symbols = [
+    //   "AAPL",
+    //   "MSFT",
+    //   "TSLA",
+    //   "NVDA",
+    //   "GOOGL",
+    //   "AMZN",
+    //   "META",
+    //   "NFLX",
+    //   "BRK.B",
+    //   "JPM",
+    // ];
+
+    // const stockData = await Promise.all(
+    //   symbols.map((symbol) =>
+    //     api.get<StockDataResponse>("/quote", {
+    //       symbol: symbol,
+    //     })
+    //   )
+    // );
+    // return stockData.sort((a, b) => b.volume - a.volume);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { getDataByStockName, getTopGainers };
